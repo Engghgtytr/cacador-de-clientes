@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Caçador de clientes</title>
+    <meta name="description" content="Painel local: negócios sem site ou com site ruim e a mensagem pronta para cada um." />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='14' cy='14' r='9' fill='none' stroke='%230f6e66' stroke-width='4'/%3E%3Cpath d='M21 21l7 7' stroke='%230f6e66' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E" />
+    <link rel="stylesheet" href="app.css" />
+  </head>
+  <body>
+    <a class="pular" href="#ficha">Pular para a ficha</a>
+    <header class="topo">
+      <div class="topo__linha">
+        <div>
+          <h1 class="marca">Caçador de clientes</h1>
+          <p class="sub" id="origem">Carregando…</p>
+        </div>
+        <div class="cota" id="cota" aria-live="polite"></div>
+      </div>
+      <div class="filtros">
+        <div class="abas" role="tablist" aria-label="Etapas" id="abas"></div>
+        <div class="filtros__linha">
+          <div class="ramos" role="group" aria-label="Ramo" id="ramos"></div>
+          <label class="busca">
+            <span class="visivel-leitor">Buscar por nome ou bairro</span>
+            <input type="search" id="busca" placeholder="Buscar nome ou bairro" autocomplete="off" />
+          </label>
+          <a class="link" href="pacotes.html" target="_blank" rel="noopener">Tabela de preços</a>
+        </div>
+      </div>
+    </header>
+    <main class="area">
+      <section class="lista" aria-label="Empresas">
+        <p class="contagem" id="contagem" aria-live="polite"></p>
+        <ul id="lista"></ul>
+        <button class="botao botao--secundario" type="button" id="mais" hidden>Mostrar mais</button>
+      </section>
+      <section class="ficha" id="ficha" tabindex="-1" aria-label="Ficha da empresa"></section>
+    </main>
+    <footer class="rodape">
+      <p>Dados de empresas: © colaboradores do <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>. O mapa pode estar desatualizado: confira antes de mandar. Este painel não envia nada sozinho.</p>
+    </footer>
+    <script src="app.js"></script>
+  </body>
+</html>
