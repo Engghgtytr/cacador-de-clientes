@@ -196,3 +196,18 @@ def test_limite_por_dia(tmp_path, servidor):
     pedido(servidor + "/api/status", {"id": "node/1", "status": "novo"}, ok)
     codigo, r = pedido(servidor + "/api/status", {"id": "node/1", "status": "enviado"}, ok)
     assert codigo == 429 and "Limite" in r["erro"]
+
+
+@pytest.mark.parametrize("url", [
+    "http://127.0.0.1:8765/api/dados", "http://localhost/", "http://192.168.0.1/", "http://10.0.0.5/",
+    "http://169.254.169.254/", "file:///C:/Windows/win.ini", "ftp://exemplo.com/", "http://[::1]/",
+])
+def test_nao_abre_endereco_da_rede_local(url):
+    with pytest.raises(sites.EnderecoProibido):
+        sites.conferir_endereco(url)
+    assert sites.analisar(url)["no_ar"] is False  # vira "o site não abre", sem acessar nada
+
+
+def test_porta_fora_do_padrao_bloqueada():
+    with pytest.raises(sites.EnderecoProibido):
+        sites.conferir_endereco("http://8.8.8.8:8080/")

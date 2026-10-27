@@ -4,8 +4,11 @@ Só abre a página inicial, uma vez, como um visitante comum.
 """
 from __future__ import annotations
 
+import ipaddress
 import re
+import socket
 import time
+import urllib.parse
 import urllib.request
 from concurrent.futures import ThreadPoolExecutor
 
@@ -13,10 +16,44 @@ AGENTE = "Mozilla/5.0 (compatible; cacador-de-clientes/1.0; conferencia de site)
 LENTO_SEGUNDOS = 4.0
 
 
+class EnderecoProibido(Exception):
+    pass
+
+
+def conferir_endereco(url: str) -> None:
+    """Os sites vêm do mapa, que qualquer um edita: só abre endereço público da internet.
+
+    Bloqueia o próprio PC (127.0.0.1, o painel), a rede de casa (roteador, 192.168…)
+    e portas fora do padrão, também em cada redirecionamento.
+    """
+    partes = urllib.parse.urlsplit(url)
+    if partes.scheme not in ("http", "https") or not partes.hostname:
+        raise EnderecoProibido(url)
+    if partes.port not in (None, 80, 443):
+        raise EnderecoProibido(url)
+    try:
+        enderecos = {info[4][0] for info in socket.getaddrinfo(partes.hostname, None)}
+    except socket.gaierror as erro:
+        raise EnderecoProibido(url) from erro
+    for ip in enderecos:
+        if not ipaddress.ip_address(ip.split("%")[0]).is_global:
+            raise EnderecoProibido(url)
+
+
+class _RedirecionaComCuidado(urllib.request.HTTPRedirectHandler):
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        conferir_endereco(newurl)
+        return super().redirect_request(req, fp, code, msg, headers, newurl)
+
+
+_ABRIDOR = urllib.request.build_opener(_RedirecionaComCuidado)
+
+
 def _abrir(url: str):
+    conferir_endereco(url)
     pedido = urllib.request.Request(url, headers={"User-Agent": AGENTE})
     inicio = time.monotonic()
-    with urllib.request.urlopen(pedido, timeout=12) as r:
+    with _ABRIDOR.open(pedido, timeout=12) as r:
         html = r.read(400_000).decode("utf-8", errors="ignore")
         return r.status, r.geturl(), html, time.monotonic() - inicio
 
