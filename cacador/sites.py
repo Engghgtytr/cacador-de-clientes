@@ -4,6 +4,7 @@ Só abre a página inicial, uma vez, como um visitante comum.
 """
 from __future__ import annotations
 
+import http.client
 import ipaddress
 import re
 import socket
@@ -46,7 +47,38 @@ class _RedirecionaComCuidado(urllib.request.HTTPRedirectHandler):
         return super().redirect_request(req, fp, code, msg, headers, newurl)
 
 
-_ABRIDOR = urllib.request.build_opener(_RedirecionaComCuidado)
+def _conferir_conexao(conexao) -> None:
+    # Confere o IP em que a conexão realmente entrou: o nome pode ter mudado de IP
+    # entre a conferência e a conexão (o truque do "DNS rebinding").
+    ip = conexao.sock.getpeername()[0]
+    if not ipaddress.ip_address(ip.split("%")[0]).is_global:
+        conexao.close()
+        raise EnderecoProibido(ip)
+
+
+class _HTTPConferido(http.client.HTTPConnection):
+    def connect(self):
+        super().connect()
+        _conferir_conexao(self)
+
+
+class _HTTPSConferido(http.client.HTTPSConnection):
+    def connect(self):
+        super().connect()
+        _conferir_conexao(self)
+
+
+class _AbreHTTP(urllib.request.HTTPHandler):
+    def http_open(self, req):
+        return self.do_open(_HTTPConferido, req)
+
+
+class _AbreHTTPS(urllib.request.HTTPSHandler):
+    def https_open(self, req):
+        return self.do_open(_HTTPSConferido, req, context=self._context)
+
+
+_ABRIDOR = urllib.request.build_opener(urllib.request.ProxyHandler({}), _AbreHTTP, _AbreHTTPS, _RedirecionaComCuidado)
 
 
 def _abrir(url: str):
