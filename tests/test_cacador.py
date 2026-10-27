@@ -211,3 +211,15 @@ def test_nao_abre_endereco_da_rede_local(url):
 def test_porta_fora_do_padrao_bloqueada():
     with pytest.raises(sites.EnderecoProibido):
         sites.conferir_endereco("http://8.8.8.8:8080/")
+
+
+def test_conexao_que_cai_em_ip_local_e_recusada():
+    """Mesmo que o nome 'mude' de IP depois da conferência, a conexão em si é conferida."""
+    import http.server
+    srv = http.server.HTTPServer(("127.0.0.1", 0), http.server.SimpleHTTPRequestHandler)
+    t = threading.Thread(target=srv.handle_request, daemon=True)
+    t.start()
+    conexao = sites._HTTPConferido("127.0.0.1", srv.server_address[1], timeout=5)
+    with pytest.raises(sites.EnderecoProibido):
+        conexao.connect()
+    srv.server_close()
