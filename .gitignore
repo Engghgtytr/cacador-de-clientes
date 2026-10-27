@@ -1,0 +1,7 @@
+.venv/
+__pycache__/
+.pytest_cache/
+*.pyc
+
+# Lista de empresas e o que voce fez com cada uma: fica so no seu PC
+dados/

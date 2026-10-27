@@ -1,0 +1,46 @@
+{
+  "_leia": "Configuração do Caçador de clientes. Nada secreto aqui.",
+  "cidade": "São Paulo",
+  "ramos": ["barbearia", "restaurante"],
+  "seu_nome": "Enzo",
+  "seu_contato": "",
+  "limite_por_dia": 15,
+  "dias_para_follow_up": 5,
+  "demos": {
+    "barbearia": "https://agendamento-alvorada.vercel.app",
+    "restaurante": "https://cardapio-chapa-sete.vercel.app"
+  },
+  "pacotes": {
+    "restaurante": [
+      {
+        "nome": "Site",
+        "preco": 300,
+        "inclui": [
+          "Site do restaurante com cardápio, fotos, horário e endereço com mapa",
+          "Botão para chamar no WhatsApp",
+          "Funciona bem no celular",
+          "Publicação na internet"
+        ]
+      },
+      {
+        "nome": "Site + controle de custos",
+        "preco": 800,
+        "inclui": [
+          "Tudo do pacote Site",
+          "App para lançar compras de ingredientes e despesas",
+          "Custo de cada prato e lucro do mês"
+        ]
+      },
+      {
+        "nome": "Completo",
+        "preco": 1500,
+        "inclui": [
+          "Tudo do pacote Site + controle de custos",
+          "Cardápio por QR code na mesa",
+          "O pedido do cliente aparece na hora na tela do garçom"
+        ]
+      }
+    ]
+  },
+  "observacao_pacotes": "Valores de desenvolvimento, pagos uma vez. Domínio próprio (ex.: seurestaurante.com.br) é registrado à parte, direto no Registro.br."
+}
